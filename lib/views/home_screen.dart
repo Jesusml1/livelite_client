@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:livelite_client/modules/streaming/backend/streaming.dart';
 import 'package:livelite_client/modules/streaming/models/room.dart';
+import 'package:livelite_client/views/widgets/available_rooms_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -33,35 +34,27 @@ class _HomeScreenState extends State<HomeScreen> {
           TextButton(onPressed: _refreshFuture, child: Icon(Icons.refresh)),
         ],
       ),
-      body: Expanded(
-        child: FutureBuilder(
-          future: _roomsFuture,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              final rooms = snapshot.data;
-              if (rooms!.isEmpty) {
-                return Center(child: Text('There are no rooms'));
-              }
-              return ListView.builder(
-                itemCount: rooms.length,
-                itemBuilder: (context, index) {
-                  final room = rooms[index];
-                  return ListTile(
-                    title: Text(room.name),
-                    trailing: ElevatedButton(
-                      child: Text('Join'),
-                      onPressed: () {},
-                    ),
-                  );
-                },
-              );
-            } else if (snapshot.hasError) {
-              return Placeholder();
-            } else {
-              return Center(child: CircularProgressIndicator());
-            }
-          },
-        ),
+      body: Column(
+        children: [
+          Expanded(
+            child: FutureBuilder(
+              future: _roomsFuture,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  final rooms = snapshot.data;
+                  if (rooms!.isEmpty) {
+                    return Center(child: Text('There are no rooms'));
+                  }
+                  return AvailableRoomsWidget(rooms: rooms);
+                } else if (snapshot.hasError) {
+                  return Placeholder();
+                } else {
+                  return Center(child: CircularProgressIndicator());
+                }
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

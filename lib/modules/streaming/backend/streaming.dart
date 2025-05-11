@@ -23,6 +23,21 @@ Future<List<Room>> listRooms() async {
   }
 }
 
-Future<String> getJoinToken() async {
-  return '';
+Future<String?> generateTokenToJoin({
+  required String roomName,
+  required String nickname,
+}) async {
+  try {
+    final request = await http.get(
+      Uri.parse('${Config.apiUrl}/join/$roomName/$nickname'),
+    );
+    if (request.statusCode == 200) {
+      final token = jsonDecode(request.body);
+      return token;
+    }
+    return null;
+  } catch (e) {
+    print(e);
+    return null;
+  }
 }
