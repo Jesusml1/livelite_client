@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:livelite_client/config/theme.dart';
 import 'package:livelite_client/views/navigation.dart';
 
 Future<void> main() async {
@@ -14,11 +15,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Bottom NavBar Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        splashColor: Colors.transparent,
-      ),
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      title: 'Livelite client',
       home: const AppNavigation(),
     );
   }
