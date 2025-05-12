@@ -7,15 +7,15 @@ part of 'rtmp_info.dart';
 // **************************************************************************
 
 _RtmpInfo _$RtmpInfoFromJson(Map<String, dynamic> json) => _RtmpInfo(
-  ingressId: json['ingressId'] as String,
+  ingressId: json['ingress_id'] as String,
   name: json['name'] as String,
-  streamKey: json['streamKey'] as String,
+  streamKey: json['stream_key'] as String,
   url: json['url'] as String,
 );
 
 Map<String, dynamic> _$RtmpInfoToJson(_RtmpInfo instance) => <String, dynamic>{
-  'ingressId': instance.ingressId,
+  'ingress_id': instance.ingressId,
   'name': instance.name,
-  'streamKey': instance.streamKey,
+  'stream_key': instance.streamKey,
   'url': instance.url,
 };

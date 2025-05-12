@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$RtmpInfo {
 
- String get ingressId; String get name; String get streamKey; String get url;
+@JsonKey(name: 'ingress_id') String get ingressId; String get name;@JsonKey(name: 'stream_key') String get streamKey; String get url;
 /// Create a copy of RtmpInfo
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -49,7 +49,7 @@ abstract mixin class $RtmpInfoCopyWith<$Res>  {
   factory $RtmpInfoCopyWith(RtmpInfo value, $Res Function(RtmpInfo) _then) = _$RtmpInfoCopyWithImpl;
 @useResult
 $Res call({
- String ingressId, String name, String streamKey, String url
+@JsonKey(name: 'ingress_id') String ingressId, String name,@JsonKey(name: 'stream_key') String streamKey, String url
 });
 
 
@@ -83,12 +83,12 @@ as String,
 @JsonSerializable()
 
 class _RtmpInfo implements RtmpInfo {
-  const _RtmpInfo({required this.ingressId, required this.name, required this.streamKey, required this.url});
+  const _RtmpInfo({@JsonKey(name: 'ingress_id') required this.ingressId, required this.name, @JsonKey(name: 'stream_key') required this.streamKey, required this.url});
   factory _RtmpInfo.fromJson(Map<String, dynamic> json) => _$RtmpInfoFromJson(json);
 
-@override final  String ingressId;
+@override@JsonKey(name: 'ingress_id') final  String ingressId;
 @override final  String name;
-@override final  String streamKey;
+@override@JsonKey(name: 'stream_key') final  String streamKey;
 @override final  String url;
 
 /// Create a copy of RtmpInfo
@@ -124,7 +124,7 @@ abstract mixin class _$RtmpInfoCopyWith<$Res> implements $RtmpInfoCopyWith<$Res>
   factory _$RtmpInfoCopyWith(_RtmpInfo value, $Res Function(_RtmpInfo) _then) = __$RtmpInfoCopyWithImpl;
 @override @useResult
 $Res call({
- String ingressId, String name, String streamKey, String url
+@JsonKey(name: 'ingress_id') String ingressId, String name,@JsonKey(name: 'stream_key') String streamKey, String url
 });
 
 
