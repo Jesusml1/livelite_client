@@ -731,12 +731,24 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
             padding: const EdgeInsets.only(top: 12),
             child: Row(
               children: [
-                Expanded(
-                  child: TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text('Cancel'),
+                if (_index == 0)
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text('Cancel'),
+                    ),
                   ),
-                ),
+                if (_index > 0)
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () {
+                        setState(() {
+                          _index -= 1;
+                        });
+                      },
+                      child: Text('Atras'),
+                    ),
+                  ),
                 Expanded(
                   child: FilledButton(
                     onPressed: () {
