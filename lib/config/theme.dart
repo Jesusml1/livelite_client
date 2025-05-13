@@ -19,7 +19,7 @@ abstract final class AppTheme {
   // The FlexColorScheme defined light mode ThemeData.
   static ThemeData light = FlexThemeData.light(
     // Using FlexColorScheme built-in FlexScheme enum based colors
-    scheme: FlexScheme.shadGreen,
+    scheme: FlexScheme.tealM3,
     // Component theme configurations for light mode.
     subThemesData: const FlexSubThemesData(
       interactionEffects: true,
@@ -29,9 +29,13 @@ abstract final class AppTheme {
       filledButtonRadius: 4.0,
       elevatedButtonRadius: 4.0,
       outlinedButtonRadius: 4.0,
+      segmentedButtonRadius: 8.0,
       inputDecoratorIsFilled: true,
+      inputDecoratorContentPadding: EdgeInsetsDirectional.fromSTEB(12, 8, 12, 8),
       inputDecoratorBorderType: FlexInputBorderType.outline,
       alignedDropdown: true,
+      searchBarRadius: 8.0,
+      searchViewRadius: 8.0,
       navigationRailUseIndicator: true,
     ),
     // Direct ThemeData properties.
@@ -42,7 +46,7 @@ abstract final class AppTheme {
   // The FlexColorScheme defined dark mode ThemeData.
   static ThemeData dark = FlexThemeData.dark(
     // Using FlexColorScheme built-in FlexScheme enum based colors.
-    scheme: FlexScheme.shadGreen,
+    scheme: FlexScheme.tealM3,
     // Component theme configurations for dark mode.
     subThemesData: const FlexSubThemesData(
       interactionEffects: true,
@@ -53,9 +57,14 @@ abstract final class AppTheme {
       filledButtonRadius: 4.0,
       elevatedButtonRadius: 4.0,
       outlinedButtonRadius: 4.0,
+      segmentedButtonRadius: 8.0,
       inputDecoratorIsFilled: true,
+      inputDecoratorContentPadding: EdgeInsetsDirectional.fromSTEB(12, 8, 12, 8),
+      inputDecoratorBackgroundAlpha: 50,
       inputDecoratorBorderType: FlexInputBorderType.outline,
       alignedDropdown: true,
+      searchBarRadius: 8.0,
+      searchViewRadius: 8.0,
       navigationRailUseIndicator: true,
     ),
     // Direct ThemeData properties.

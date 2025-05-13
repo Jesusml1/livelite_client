@@ -44,6 +44,7 @@ dependencies:
   webrtc_interface: ^1.2.2+hotfix.2
   flex_color_scheme: ^8.2.0
   flutter_secure_storage: ^9.2.4
+  forui: ^0.11.1
 
 dev_dependencies:
   flutter_test:

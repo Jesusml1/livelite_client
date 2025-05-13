@@ -1,0 +1,21 @@
+{
+    "playground_data": "Themes Playground data exported 13.05.2025 14:51:03",
+    "playground_version": "8.2.0",
+    "elevatedButtonBorderRadius": 4,
+    "filledButtonBorderRadius": 4,
+    "inputDecoratorBackgroundAlphaDark": 50,
+    "inputDecoratorPaddingBottom": 8,
+    "inputDecoratorPaddingTop": 8,
+    "inputDecoratorUnfocusedHasBorder": true,
+    "outlinedButtonBorderRadius": 4,
+    "schemeIndex": 49,
+    "searchIsFullScreen": false,
+    "searchRadius": 8,
+    "segmentedButtonBorderRadius": 8,
+    "simulatorAppIndex": 0,
+    "simulatorComponentsIndex": 2,
+    "simulatorDeviceIndex": 17,
+    "textButtonBorderRadius": 4,
+    "topicIndexEndSide": 25,
+    "topicIndexStartSide": 4
+}
