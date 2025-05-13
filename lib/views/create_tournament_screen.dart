@@ -1,6 +1,4 @@
 import 'dart:collection';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 const List<String> list = <String>[
@@ -10,14 +8,9 @@ const List<String> list = <String>[
 ];
 typedef MenuEntry = DropdownMenuEntry<String>;
 
-enum Sky { automatico, manual }
-
 enum TournamentType { public, private }
 
-Map<Sky, Color> skyColors = <Sky, Color>{
-  Sky.automatico: const Color(0xff191970),
-  Sky.manual: const Color(0xff40826d),
-};
+enum CondutionMode { auto, manual }
 
 class CreateTournamentScreen extends StatefulWidget {
   const CreateTournamentScreen({super.key});
@@ -34,9 +27,8 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
   );
   String dropdownValue = list.first;
 
-  Sky _selectedSegment = Sky.automatico;
-
   TournamentType tournamentTypeView = TournamentType.public;
+  CondutionMode condutionModeView = CondutionMode.auto;
 
   @override
   Widget build(BuildContext context) {
@@ -262,7 +254,10 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                   children: [
                     const Text(
                       'Detalles del torneo',
-                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -343,7 +338,7 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
             ),
           ),
           Step(
-            title: Text(_index == 2 ? 'Llave': ''),
+            title: Text(_index == 2 ? 'Llave' : ''),
             isActive: _index == 2,
             content: SizedBox(
               height: MediaQuery.of(context).size.height * 0.65,
@@ -354,17 +349,24 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                   children: [
                     const Text(
                       'Detalles de la llave',
-                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
                     Column(
                       spacing: 6,
                       children: [
                         Card(
-                          color: Theme.of(context).colorScheme.surfaceContainerHigh,
+                          color:
+                              Theme.of(
+                                context,
+                              ).colorScheme.surfaceContainerHigh,
                           child: Column(
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
                                 children: [
                                   Icon(Icons.money_off_csred_rounded, size: 82),
                                   Text(
@@ -390,7 +392,8 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                           child: Column(
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
                                 children: [
                                   Icon(Icons.price_check_rounded, size: 82),
                                   Text(
@@ -455,7 +458,7 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                         ),
                       ],
                     ),
-                
+
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       spacing: 6,
@@ -474,7 +477,7 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                         ),
                       ],
                     ),
-                
+
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       spacing: 6,
@@ -493,7 +496,7 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                         ),
                       ],
                     ),
-                
+
                     Row(
                       children: [
                         Expanded(
@@ -542,23 +545,28 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
             ),
           ),
           Step(
-            title:  Text(_index == 3 ? 'Cronograma' : ''),
+            title: Text(_index == 3 ? 'Cronograma' : ''),
             isActive: _index == 3,
             content: SizedBox(
               height: MediaQuery.of(context).size.height * 0.65,
               child: SingleChildScrollView(
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   spacing: 12,
                   children: [
                     Column(
                       spacing: 6,
                       children: [
                         Card(
-                          color: Theme.of(context).colorScheme.surfaceContainerHigh,
+                          color:
+                              Theme.of(
+                                context,
+                              ).colorScheme.surfaceContainerHigh,
                           child: Column(
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
                                 children: [
                                   Icon(Icons.money_off_csred_rounded, size: 82),
                                   Text(
@@ -584,7 +592,8 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                           child: Column(
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
                                 children: [
                                   Icon(Icons.format_list_bulleted, size: 82),
                                   Text(
@@ -607,33 +616,35 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                         ),
                       ],
                     ),
+                    const Text(
+                      'Modo de conducción',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
                     SizedBox(
                       width: double.infinity,
-                      child: CupertinoSlidingSegmentedControl(
-                        onValueChanged: (value) {
-                          if (value != null) {
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: SegmentedButton(
+                          onSelectionChanged: (p0) {
                             setState(() {
-                              _selectedSegment = value;
+                              condutionModeView = p0.first;
                             });
-                          }
-                        },
-                        groupValue: _selectedSegment,
-                        children: const <Sky, Widget>{
-                          Sky.automatico: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 20),
-                            child: Text(
-                              'Automatico',
-                              style: TextStyle(color: CupertinoColors.white),
+                          },
+                          segments: <ButtonSegment<CondutionMode>>[
+                            ButtonSegment(
+                              value: CondutionMode.auto,
+                              label: Text('Automatico'),
                             ),
-                          ),
-                          Sky.manual: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 20),
-                            child: Text(
-                              'Manual',
-                              style: TextStyle(color: CupertinoColors.white),
+                            ButtonSegment(
+                              value: CondutionMode.manual,
+                              label: Text('Manual'),
                             ),
-                          ),
-                        },
+                          ],
+                          selected: <CondutionMode>{condutionModeView},
+                        ),
                       ),
                     ),
                     Text(
@@ -642,7 +653,7 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                     Text(
                       '(*Modo Manual: El organizador del torneo debe iniciar manualmente todas las rondas y partidos dentro de las rondas. Esto puede ser especialmente util al planificar la transmision de algunas partidas.',
                     ),
-                
+
                     Column(
                       children: [
                         Row(
@@ -663,7 +674,7 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                         ),
                       ],
                     ),
-                
+
                     Column(
                       children: [
                         Row(
@@ -686,7 +697,7 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                         ),
                       ],
                     ),
-                
+
                     Column(
                       children: [
                         Row(
