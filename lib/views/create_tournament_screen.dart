@@ -165,6 +165,8 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
         },
 
         steps: <Step>[
+          // Step 1
+          // Seleccion de torneo
           Step(
             isActive: _index == 0,
             title: Text(_index == 0 ? 'Torneo' : ''),
@@ -344,6 +346,8 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
               ),
             ),
           ),
+          // Step 2
+          // Detalles del torneo
           Step(
             title: Text(_index == 1 ? 'Detalles' : ''),
             isActive: _index == 1,
@@ -498,6 +502,8 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
               ),
             ),
           ),
+          // Step 3
+          // Detalles de la llave
           Step(
             title: Text(_index == 2 ? 'Llave' : ''),
             isActive: _index == 2,
@@ -675,6 +681,8 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
               ),
             ),
           ),
+          // Step 4
+          // Registro y cronograma
           Step(
             title: Text(_index == 3 ? 'Cronograma' : ''),
             isActive: _index == 3,
@@ -685,6 +693,13 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   spacing: 12,
                   children: [
+                    Text(
+                      'Registro y cronograma',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
                     Column(
                       spacing: 6,
                       children: [
