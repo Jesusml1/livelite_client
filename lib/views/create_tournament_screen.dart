@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:livelite_client/modules/models/tournament_create_request.dart';
 
 const List<String> games = <String>[
   'Call Of Duty: Mobile',
@@ -39,9 +40,15 @@ const List<String> pointSystem = <String>[
 
 typedef MenuEntry = DropdownMenuEntry<String>;
 
+enum TournamentMode { withPrize, withoutPrize }
+
 enum TournamentType { public, private }
 
 enum CondutionMode { auto, manual }
+
+enum TournamentEliminationMode { singleElimination, doubleElimination }
+
+enum TournamentRegistrationType { simpleRegistration, checkInRegistration }
 
 class CreateTournamentScreen extends StatefulWidget {
   const CreateTournamentScreen({super.key});
@@ -56,87 +63,97 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
   DateTime? _dateSelected;
   TimeOfDay? _timeSelected;
 
-  static final List<MenuEntry> gamesEntries = UnmodifiableListView<MenuEntry>(
+  TournamentMode _selectedMode = TournamentMode.withoutPrize;
+  TournamentEliminationMode _selectedEliminationMode =
+      TournamentEliminationMode.singleElimination;
+  TournamentRegistrationType _selectedRegistrationType =
+      TournamentRegistrationType.simpleRegistration;
+
+  static final List<MenuEntry> _gamesEntries = UnmodifiableListView<MenuEntry>(
     games.map<MenuEntry>((String name) => MenuEntry(value: name, label: name)),
   );
-  String gamesDropdownvalue = games.first;
+  String _gamesDropdownvalue = games.first;
 
-  static final List<MenuEntry> confrontationTypeEntries =
+  static final List<MenuEntry> _confrontationTypeEntries =
       UnmodifiableListView<MenuEntry>(
         confrontationTypes.map<MenuEntry>(
           (String name) => MenuEntry(value: name, label: name),
         ),
       );
-  String confrontationTypeDropdownvalue = confrontationTypes.first;
+  String _confrontationTypeDropdownvalue = confrontationTypes.first;
 
-  static final List<MenuEntry> teamSizesEntries =
+  static final List<MenuEntry> _teamSizesEntries =
       UnmodifiableListView<MenuEntry>(
         teamSizes.map<MenuEntry>(
           (String name) => MenuEntry(value: name, label: name),
         ),
       );
-  String teamSizeDropdownvalue = confrontationTypes.first;
+  String _teamSizeDropdownvalue = confrontationTypes.first;
 
-  static final List<MenuEntry> substitutesAmountEntries =
+  static final List<MenuEntry> _substitutesAmountEntries =
       UnmodifiableListView<MenuEntry>(
         substitutesAmount.map<MenuEntry>(
           (String name) => MenuEntry(value: name, label: name),
         ),
       );
-  String substitutesAmountDropdownvalue = confrontationTypes.first;
+  String _substitutesAmountDropdownvalue = confrontationTypes.first;
 
-  static final List<MenuEntry> regionEntries = UnmodifiableListView<MenuEntry>(
+  static final List<MenuEntry> _regionEntries = UnmodifiableListView<MenuEntry>(
     confrontationTypes.map<MenuEntry>(
       (String name) => MenuEntry(value: name, label: name),
     ),
   );
-  String regionDropdownvalue = confrontationTypes.first;
+  String _regionDropdownvalue = confrontationTypes.first;
 
-  static final List<MenuEntry> pointSystemEntries =
+  static final List<MenuEntry> _pointSystemEntries =
       UnmodifiableListView<MenuEntry>(
         pointSystem.map<MenuEntry>(
           (String name) => MenuEntry(value: name, label: name),
         ),
       );
 
-  String pointSystemDropdownValue = pointSystem.first;
+  String _pointSystemDropdownValue = pointSystem.first;
 
-  TournamentType tournamentTypeView = TournamentType.public;
-  CondutionMode condutionModeView = CondutionMode.auto;
+  TournamentType _tournamentTypeView = TournamentType.public;
+  CondutionMode _condutionModeView = CondutionMode.auto;
 
-  late TextEditingController playersAmountTEC;
-  late TextEditingController tournamentNameTEC;
-  late TextEditingController minPlayersTEC;
-  late TextEditingController maxPlayersTEC;
-  late TextEditingController teamsPerMatchTEC;
-  late TextEditingController pointsPerKillTEC;
-  late TextEditingController dateSelectedTEC;
-  late TextEditingController timeSelectedTEC;
+  bool _autoStartMatch = false;
+  bool _autoCancelMatch = false;
+  bool _autoCancelFailedMatch = false;
+
+  late TextEditingController _playersAmountTEC;
+  late TextEditingController _tournamentNameTEC;
+  late TextEditingController _minPlayersTEC;
+  late TextEditingController _maxPlayersTEC;
+  late TextEditingController _teamsPerMatchTEC;
+  late TextEditingController _pointsPerKillTEC;
+  late TextEditingController _dateSelectedTEC;
+  late TextEditingController _timeSelectedTEC;
 
   @override
   void initState() {
     super.initState();
-    playersAmountTEC = TextEditingController();
-    tournamentNameTEC = TextEditingController();
-    minPlayersTEC = TextEditingController();
-    maxPlayersTEC = TextEditingController();
-    teamsPerMatchTEC = TextEditingController();
-    pointsPerKillTEC = TextEditingController();
-    dateSelectedTEC = TextEditingController();
-    timeSelectedTEC = TextEditingController();
+    _playersAmountTEC = TextEditingController();
+    _tournamentNameTEC = TextEditingController();
+    _minPlayersTEC = TextEditingController();
+    _maxPlayersTEC = TextEditingController();
+    _teamsPerMatchTEC = TextEditingController();
+    _pointsPerKillTEC = TextEditingController();
+    _dateSelectedTEC = TextEditingController();
+    _timeSelectedTEC = TextEditingController();
   }
 
   @override
   void dispose() {
     super.dispose();
-    playersAmountTEC.dispose();
-    tournamentNameTEC.dispose();
-    minPlayersTEC.dispose();
-    maxPlayersTEC.dispose();
-    teamsPerMatchTEC.dispose();
-    pointsPerKillTEC.dispose();
-    dateSelectedTEC.dispose();
-    timeSelectedTEC.dispose();
+    _playersAmountTEC.dispose();
+    _tournamentNameTEC.dispose();
+    _minPlayersTEC.dispose();
+    _maxPlayersTEC.dispose();
+    _teamsPerMatchTEC.dispose();
+    _pointsPerKillTEC.dispose();
+    _dateSelectedTEC.dispose();
+    _timeSelectedTEC.dispose();
   }
 
   @override
@@ -189,61 +206,89 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                     Column(
                       spacing: 6,
                       children: [
-                        Card(
-                          color:
-                              Theme.of(
-                                context,
-                              ).colorScheme.surfaceContainerHigh,
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Icon(Icons.money_off_csred_rounded, size: 82),
-                                  Text(
-                                    'Torneo\nSin Premio',
-                                    style: TextStyle(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.w800,
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _selectedMode = TournamentMode.withoutPrize;
+                            });
+                          },
+                          child: Card(
+                            color:
+                                _selectedMode == TournamentMode.withoutPrize
+                                    ? Theme.of(
+                                      context,
+                                    ).colorScheme.primaryContainer
+                                    : Theme.of(
+                                      context,
+                                    ).colorScheme.surfaceContainerHigh,
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Icon(
+                                      Icons.money_off_csred_rounded,
+                                      size: 82,
                                     ),
-                                  ),
-                                ],
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(12),
-                                child: Text(
-                                  'Crea torneos sin premios y disfruta de la experiencia totalmente gratis!',
+                                    Text(
+                                      'Torneo\nSin Premio',
+                                      style: TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ],
+                                Padding(
+                                  padding: const EdgeInsets.all(12),
+                                  child: Text(
+                                    'Crea torneos sin premios y disfruta de la experiencia totalmente gratis!',
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                        Card(
-                          // color: Theme.of(context).colorScheme.secondary,
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Icon(Icons.price_check_rounded, size: 82),
-                                  Text(
-                                    'Torneo\nCon Premio',
-                                    style: TextStyle(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.w800,
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _selectedMode = TournamentMode.withPrize;
+                            });
+                          },
+                          child: Card(
+                            color:
+                                _selectedMode == TournamentMode.withPrize
+                                    ? Theme.of(
+                                      context,
+                                    ).colorScheme.primaryContainer
+                                    : Theme.of(
+                                      context,
+                                    ).colorScheme.surfaceContainerHigh,
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Icon(Icons.price_check_rounded, size: 82),
+                                    Text(
+                                      'Torneo\nCon Premio',
+                                      style: TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.w800,
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(12),
-                                child: Text(
-                                  'El creador financia integramente el premio y los jugadores participan gratis. el importe del premio se descontara de tu wallet al finalizar la creacion del mismo',
+                                  ],
                                 ),
-                              ),
-                            ],
+                                Padding(
+                                  padding: const EdgeInsets.all(12),
+                                  child: Text(
+                                    'El creador financia integramente el premio y los jugadores participan gratis. el importe del premio se descontara de tu wallet al finalizar la creacion del mismo',
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ],
@@ -257,11 +302,11 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                     ),
                     DropdownMenu(
                       width: double.infinity,
-                      dropdownMenuEntries: gamesEntries,
+                      dropdownMenuEntries: _gamesEntries,
                       initialSelection: games.first,
                       onSelected: (String? value) {
                         setState(() {
-                          gamesDropdownvalue = value!;
+                          _gamesDropdownvalue = value!;
                         });
                       },
                     ),
@@ -279,11 +324,11 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                         Text('Tipo de Enfrentamiento'),
                         DropdownMenu(
                           width: double.infinity,
-                          dropdownMenuEntries: confrontationTypeEntries,
+                          dropdownMenuEntries: _confrontationTypeEntries,
                           initialSelection: confrontationTypes.first,
                           onSelected: (String? value) {
                             setState(() {
-                              confrontationTypeDropdownvalue = value!;
+                              _confrontationTypeDropdownvalue = value!;
                             });
                           },
                         ),
@@ -295,7 +340,7 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                       children: [
                         Text('Cantidad de Jugadores'),
                         TextField(
-                          controller: playersAmountTEC,
+                          controller: _playersAmountTEC,
                           keyboardType: TextInputType.number,
                           maxLength: 3,
                         ),
@@ -309,12 +354,12 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                         Text('Tamaño del Equipo'),
                         DropdownMenu(
                           width: double.infinity,
-                          dropdownMenuEntries: teamSizesEntries,
+                          dropdownMenuEntries: _teamSizesEntries,
                           initialSelection: teamSizes.first,
                           onSelected: (String? value) {
                             // This is called when the user selects an item.
                             setState(() {
-                              teamSizeDropdownvalue = value!;
+                              _teamSizeDropdownvalue = value!;
                             });
                           },
                         ),
@@ -328,12 +373,12 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                         Text('Cantidad de Sustitutos'),
                         DropdownMenu(
                           width: double.infinity,
-                          dropdownMenuEntries: substitutesAmountEntries,
+                          dropdownMenuEntries: _substitutesAmountEntries,
                           initialSelection: substitutesAmount.first,
                           onSelected: (String? value) {
                             // This is called when the user selects an item.
                             setState(() {
-                              substitutesAmountDropdownvalue = value!;
+                              _substitutesAmountDropdownvalue = value!;
                             });
                           },
                         ),
@@ -374,7 +419,7 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                             fontWeight: FontWeight.w800,
                           ),
                         ),
-                        TextField(controller: tournamentNameTEC),
+                        TextField(controller: _tournamentNameTEC),
                       ],
                     ),
                     Column(
@@ -393,7 +438,7 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                           children: [
                             Expanded(
                               child: TextField(
-                                controller: dateSelectedTEC,
+                                controller: _dateSelectedTEC,
                                 onTap: () async {
                                   if (Platform.isIOS) {
                                     await showCupertinoModalPopup<void>(
@@ -414,7 +459,7 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                                               onDateTimeChanged: (date) {
                                                 setState(() {
                                                   _dateSelected = date;
-                                                  dateSelectedTEC.text =
+                                                  _dateSelectedTEC.text =
                                                       '${date.day}/${date.month}/${date.year}';
                                                 });
                                               },
@@ -435,7 +480,7 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                                   if (dateSelected != null) {
                                     setState(() {
                                       _dateSelected = dateSelected;
-                                      dateSelectedTEC.text =
+                                      _dateSelectedTEC.text =
                                           '${dateSelected.day}/${dateSelected.month}/${dateSelected.year}';
                                     });
                                   }
@@ -447,7 +492,7 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                             ),
                             Expanded(
                               child: TextField(
-                                controller: timeSelectedTEC,
+                                controller: _timeSelectedTEC,
                                 onTap: () async {
                                   if (Platform.isIOS) {
                                     await showCupertinoModalPopup<void>(
@@ -471,7 +516,7 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                                                     hour: date.hour,
                                                     minute: date.minute,
                                                   );
-                                                  timeSelectedTEC.text =
+                                                  _timeSelectedTEC.text =
                                                       '${date.hour}:${date.minute}';
                                                 });
                                               },
@@ -490,7 +535,7 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                                   if (timeSelected != null) {
                                     setState(() {
                                       _timeSelected = timeSelected;
-                                      timeSelectedTEC.text =
+                                      _timeSelectedTEC.text =
                                           '${timeSelected.hour}:${timeSelected.minute}';
                                     });
                                   }
@@ -515,12 +560,12 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                         ),
                         DropdownMenu(
                           width: double.infinity,
-                          dropdownMenuEntries: regionEntries,
+                          dropdownMenuEntries: _regionEntries,
                           initialSelection: regions.first,
                           onSelected: (String? value) {
                             // This is called when the user selects an item.
                             setState(() {
-                              regionDropdownvalue = value!;
+                              _regionDropdownvalue = value!;
                             });
                           },
                         ),
@@ -542,7 +587,7 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                           child: SegmentedButton(
                             onSelectionChanged: (p0) {
                               setState(() {
-                                tournamentTypeView = p0.first;
+                                _tournamentTypeView = p0.first;
                               });
                             },
                             segments: <ButtonSegment<TournamentType>>[
@@ -555,7 +600,7 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                                 label: Text('Privado'),
                               ),
                             ],
-                            selected: <TournamentType>{tournamentTypeView},
+                            selected: <TournamentType>{_tournamentTypeView},
                           ),
                         ),
                       ],
@@ -587,61 +632,95 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                     Column(
                       spacing: 6,
                       children: [
-                        Card(
-                          color:
-                              Theme.of(
-                                context,
-                              ).colorScheme.surfaceContainerHigh,
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Icon(Icons.money_off_csred_rounded, size: 82),
-                                  Text(
-                                    'Eliminacion\nSimple',
-                                    style: TextStyle(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.w800,
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _selectedEliminationMode =
+                                  TournamentEliminationMode.singleElimination;
+                            });
+                          },
+                          child: Card(
+                            color:
+                                _selectedEliminationMode ==
+                                        TournamentEliminationMode
+                                            .singleElimination
+                                    ? Theme.of(
+                                      context,
+                                    ).colorScheme.primaryContainer
+                                    : Theme.of(
+                                      context,
+                                    ).colorScheme.surfaceContainerHigh,
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Icon(
+                                      Icons.money_off_csred_rounded,
+                                      size: 82,
                                     ),
-                                  ),
-                                ],
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(12),
-                                child: Text(
-                                  'Un formato de torneo tradicional donde la mitad de todos los jugadores son eliminados en cada ronda hasta que solo queda un ganador.',
+                                    Text(
+                                      'Eliminacion\nSimple',
+                                      style: TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ],
+                                Padding(
+                                  padding: const EdgeInsets.all(12),
+                                  child: Text(
+                                    'Un formato de torneo tradicional donde la mitad de todos los jugadores son eliminados en cada ronda hasta que solo queda un ganador.',
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                        Card(
-                          // color: Theme.of(context).colorScheme.secondary,
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Icon(Icons.price_check_rounded, size: 82),
-                                  Text(
-                                    'Doble\nEliminacion',
-                                    style: TextStyle(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.w800,
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _selectedEliminationMode =
+                                  TournamentEliminationMode.doubleElimination;
+                            });
+                          },
+                          child: Card(
+                            color:
+                                _selectedEliminationMode ==
+                                        TournamentEliminationMode
+                                            .doubleElimination
+                                    ? Theme.of(
+                                      context,
+                                    ).colorScheme.primaryContainer
+                                    : Theme.of(
+                                      context,
+                                    ).colorScheme.surfaceContainerHigh,
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Icon(Icons.price_check_rounded, size: 82),
+                                    Text(
+                                      'Doble\nEliminacion',
+                                      style: TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.w800,
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(12),
-                                child: Text(
-                                  'Los perdedores de una ronda continuan jugando en el cuadro inferior, mientras que los ganadores siguen jugando en el cuadro superior. Los jugadores quedan eliminados tras peder dos partidos.',
+                                  ],
                                 ),
-                              ),
-                            ],
+                                Padding(
+                                  padding: const EdgeInsets.all(12),
+                                  child: Text(
+                                    'Los perdedores de una ronda continuan jugando en el cuadro inferior, mientras que los ganadores siguen jugando en el cuadro superior. Los jugadores quedan eliminados tras peder dos partidos.',
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ],
@@ -663,7 +742,7 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                             children: [
                               Text('Minimo'),
                               TextField(
-                                controller: minPlayersTEC,
+                                controller: _minPlayersTEC,
                                 keyboardType: TextInputType.number,
                                 maxLength: 2,
                                 decoration: InputDecoration(
@@ -680,7 +759,7 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                             children: [
                               Text('Maximo'),
                               TextField(
-                                controller: maxPlayersTEC,
+                                controller: _maxPlayersTEC,
                                 keyboardType: TextInputType.number,
                                 maxLength: 2,
                                 decoration: InputDecoration(
@@ -699,7 +778,7 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                       children: [
                         Text('Equipos por partido'),
                         TextField(
-                          controller: teamsPerMatchTEC,
+                          controller: _teamsPerMatchTEC,
                           keyboardType: TextInputType.number,
                           maxLength: 2,
                         ),
@@ -713,12 +792,11 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                         Text('Sistema de puntos'),
                         DropdownMenu(
                           width: double.infinity,
-                          dropdownMenuEntries: pointSystemEntries,
+                          dropdownMenuEntries: _pointSystemEntries,
                           initialSelection: pointSystem.first,
                           onSelected: (String? value) {
-                            // This is called when the user selects an item.
                             setState(() {
-                              pointSystemDropdownValue = value!;
+                              _pointSystemDropdownValue = value!;
                             });
                           },
                         ),
@@ -733,7 +811,7 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                       children: [
                         Text('Puntos por kill'),
                         TextField(
-                          controller: pointsPerKillTEC,
+                          controller: _pointsPerKillTEC,
                           keyboardType: TextInputType.number,
                           maxLength: 2,
                         ),
@@ -766,61 +844,96 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                     Column(
                       spacing: 6,
                       children: [
-                        Card(
-                          color:
-                              Theme.of(
-                                context,
-                              ).colorScheme.surfaceContainerHigh,
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Icon(Icons.money_off_csred_rounded, size: 82),
-                                  Text(
-                                    'Registro\nsencillo',
-                                    style: TextStyle(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.w800,
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _selectedRegistrationType =
+                                  TournamentRegistrationType.simpleRegistration;
+                            });
+                          },
+                          child: Card(
+                            color:
+                                _selectedRegistrationType ==
+                                        TournamentRegistrationType
+                                            .simpleRegistration
+                                    ? Theme.of(
+                                      context,
+                                    ).colorScheme.primaryContainer
+                                    : Theme.of(
+                                      context,
+                                    ).colorScheme.surfaceContainerHigh,
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Icon(
+                                      Icons.money_off_csred_rounded,
+                                      size: 82,
                                     ),
-                                  ),
-                                ],
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(12),
-                                child: Text(
-                                  'Los equipos pueden confirmar su lugar en cualquier momento antes de que comience el torneo.',
+                                    Text(
+                                      'Registro\nsencillo',
+                                      style: TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ],
+                                Padding(
+                                  padding: const EdgeInsets.all(12),
+                                  child: Text(
+                                    'Los equipos pueden confirmar su lugar en cualquier momento antes de que comience el torneo.',
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                        Card(
-                          // color: Theme.of(context).colorScheme.secondary,
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Icon(Icons.format_list_bulleted, size: 82),
-                                  Text(
-                                    'Registro con\ncheck-in',
-                                    style: TextStyle(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.w800,
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _selectedRegistrationType =
+                                  TournamentRegistrationType
+                                      .checkInRegistration;
+                            });
+                          },
+                          child: Card(
+                            color:
+                                _selectedRegistrationType ==
+                                        TournamentRegistrationType
+                                            .checkInRegistration
+                                    ? Theme.of(
+                                      context,
+                                    ).colorScheme.primaryContainer
+                                    : Theme.of(
+                                      context,
+                                    ).colorScheme.surfaceContainerHigh,
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Icon(Icons.format_list_bulleted, size: 82),
+                                    Text(
+                                      'Registro con\ncheck-in',
+                                      style: TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.w800,
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(12),
-                                child: Text(
-                                  'Los equipos solo pueden confirmar su lugar durante el periodo de check-in configurado.',
+                                  ],
                                 ),
-                              ),
-                            ],
+                                Padding(
+                                  padding: const EdgeInsets.all(12),
+                                  child: Text(
+                                    'Los equipos solo pueden confirmar su lugar durante el periodo de check-in configurado.',
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ],
@@ -839,7 +952,7 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                         child: SegmentedButton(
                           onSelectionChanged: (p0) {
                             setState(() {
-                              condutionModeView = p0.first;
+                              _condutionModeView = p0.first;
                             });
                           },
                           segments: <ButtonSegment<CondutionMode>>[
@@ -852,7 +965,7 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                               label: Text('Manual'),
                             ),
                           ],
-                          selected: <CondutionMode>{condutionModeView},
+                          selected: <CondutionMode>{_condutionModeView},
                         ),
                       ),
                     ),
@@ -875,7 +988,14 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                                 fontSize: 16,
                               ),
                             ),
-                            Switch(value: false, onChanged: (value) {}),
+                            Switch(
+                              value: _autoStartMatch,
+                              onChanged: (value) {
+                                setState(() {
+                                  _autoStartMatch = value;
+                                });
+                              },
+                            ),
                           ],
                         ),
                         Text(
@@ -898,7 +1018,14 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                                 ),
                               ),
                             ),
-                            Switch(value: false, onChanged: (value) {}),
+                            Switch(
+                              value: _autoCancelMatch,
+                              onChanged: (value) {
+                                setState(() {
+                                  _autoCancelMatch = value;
+                                });
+                              },
+                            ),
                           ],
                         ),
                         Text(
@@ -921,7 +1048,14 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                                 ),
                               ),
                             ),
-                            Switch(value: false, onChanged: (value) {}),
+                            Switch(
+                              value: _autoCancelFailedMatch,
+                              onChanged: (value) {
+                                setState(() {
+                                  _autoCancelFailedMatch = value;
+                                });
+                              },
+                            ),
                           ],
                         ),
                         Text(
@@ -973,13 +1107,44 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                   Expanded(
                     child: FilledButton(
                       onPressed: () {
-                        Fluttertoast.showToast(
-                          msg: 'Torneo creado',
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.BOTTOM,
-                          textColor: Colors.white,
-                          fontSize: 16.0,
+                        if (_dateSelectedTEC.text.isEmpty ||
+                            _timeSelectedTEC.text.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Por favor, selecciona una fecha y hora.',
+                              ),
+                            ),
+                          );
+                          return;
+                        }
+                        final requestPayload = TournamentCreateRequest(
+                          mode: _selectedMode.name,
+                          game: _gamesDropdownvalue,
+                          confrontationType: _confrontationTypeDropdownvalue,
+                          playersAmount: _playersAmountTEC.text,
+                          teamSize: _teamSizeDropdownvalue,
+                          substitutesAmount: _substitutesAmountDropdownvalue,
+                          name: _tournamentNameTEC.text,
+                          date:
+                              '${_dateSelected?.year}-${_dateSelected?.month}-${_dateSelected?.day}',
+                          time:
+                              '${_timeSelected?.hour}:${_timeSelected?.minute}',
+                          region: _regionDropdownvalue,
+                          admissionMode: _tournamentTypeView.name,
+                          eliminationType: _selectedEliminationMode.name,
+                          minTeams: int.parse(_minPlayersTEC.text),
+                          maxTeams: int.parse(_maxPlayersTEC.text),
+                          teamsPerMatch: int.parse(_teamsPerMatchTEC.text),
+                          pointSystem: _pointSystemDropdownValue,
+                          pointsPerKill: int.parse(_pointsPerKillTEC.text),
+                          registrationType: _selectedRegistrationType.name,
+                          condutionMode: _condutionModeView.name,
+                          autoStartMatch: _autoStartMatch,
+                          autoCancelMatch: _autoCancelMatch,
+                          autoCancelFailedMatch: _autoCancelFailedMatch,
                         );
+                        print(requestPayload.toJson());
                       },
                       child: Text('Crear torneo'),
                     ),
