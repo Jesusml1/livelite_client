@@ -1,5 +1,6 @@
 import 'dart:collection';
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 const List<String> games = <String>[
@@ -280,7 +281,6 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                           dropdownMenuEntries: confrontationTypeEntries,
                           initialSelection: confrontationTypes.first,
                           onSelected: (String? value) {
-                            // This is called when the user selects an item.
                             setState(() {
                               confrontationTypeDropdownvalue = value!;
                             });
@@ -294,9 +294,6 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                       children: [
                         Text('Cantidad de Jugadores'),
                         TextField(
-                          decoration: InputDecoration(
-                            hintText: '100 jugadores',
-                          ),
                           controller: playersAmountTEC,
                           keyboardType: TextInputType.number,
                           maxLength: 3,
@@ -397,6 +394,37 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                               child: TextField(
                                 controller: dateSelectedTEC,
                                 onTap: () async {
+                                  if (Platform.isIOS) {
+                                    await showCupertinoModalPopup<void>(
+                                      context: context,
+                                      builder: (context) {
+                                        return Container(
+                                          height: 300,
+                                          width: double.infinity,
+                                          color: CupertinoColors
+                                              .systemBackground
+                                              .resolveFrom(context),
+                                          child: SafeArea(
+                                            top: false,
+                                            child: CupertinoDatePicker(
+                                              mode:
+                                                  CupertinoDatePickerMode.date,
+                                              initialDateTime: DateTime.now(),
+                                              onDateTimeChanged: (date) {
+                                                setState(() {
+                                                  _dateSelected = date;
+                                                  dateSelectedTEC.text =
+                                                      '${date.day}/${date.month}/${date.year}';
+                                                });
+                                              },
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                    return;
+                                  }
+
                                   final dateSelected = await showDatePicker(
                                     context: context,
                                     initialDate: DateTime.now(),
@@ -420,6 +448,41 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                               child: TextField(
                                 controller: timeSelectedTEC,
                                 onTap: () async {
+
+                                  if(Platform.isIOS) {
+                                    await showCupertinoModalPopup<void>(
+                                      context: context,
+                                      builder: (context) {
+                                        return Container(
+                                          height: 300,
+                                          width: double.infinity,
+                                          color: CupertinoColors
+                                              .systemBackground
+                                              .resolveFrom(context),
+                                          child: SafeArea(
+                                            top: false,
+                                            child: CupertinoDatePicker(
+                                              mode:
+                                                  CupertinoDatePickerMode.time,
+                                              initialDateTime: DateTime.now(),
+                                              onDateTimeChanged: (date) {
+                                                setState(() {
+                                                  _timeSelected = TimeOfDay(
+                                                    hour: date.hour,
+                                                    minute: date.minute,
+                                                  );
+                                                  timeSelectedTEC.text =
+                                                      '${date.hour}:${date.minute}';
+                                                });
+                                              },
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                    return;
+                                  }
+
                                   final timeSelected = await showTimePicker(
                                     context: context,
                                     initialTime: TimeOfDay.now(),
