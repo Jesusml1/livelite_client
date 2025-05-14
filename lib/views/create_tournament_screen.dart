@@ -2,6 +2,7 @@ import 'dart:collection';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 const List<String> games = <String>[
   'Call Of Duty: Mobile',
@@ -448,8 +449,7 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                               child: TextField(
                                 controller: timeSelectedTEC,
                                 onTap: () async {
-
-                                  if(Platform.isIOS) {
+                                  if (Platform.isIOS) {
                                     await showCupertinoModalPopup<void>(
                                       context: context,
                                       builder: (context) {
@@ -958,16 +958,32 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                       child: Text('Atras'),
                     ),
                   ),
-                Expanded(
-                  child: FilledButton(
-                    onPressed: () {
-                      setState(() {
-                        _index += 1;
-                      });
-                    },
-                    child: Text('Siguiente'),
+                if (_index <= 2)
+                  Expanded(
+                    child: FilledButton(
+                      onPressed: () {
+                        setState(() {
+                          _index += 1;
+                        });
+                      },
+                      child: Text('Siguiente'),
+                    ),
                   ),
-                ),
+                if (_index > 2)
+                  Expanded(
+                    child: FilledButton(
+                      onPressed: () {
+                        Fluttertoast.showToast(
+                          msg: 'Torneo creado',
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.BOTTOM,
+                          textColor: Colors.white,
+                          fontSize: 16.0,
+                        );
+                      },
+                      child: Text('Crear torneo'),
+                    ),
+                  ),
               ],
             ),
           );
