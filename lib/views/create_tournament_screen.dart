@@ -1,11 +1,39 @@
 import 'dart:collection';
 import 'package:flutter/material.dart';
 
-const List<String> list = <String>[
+const List<String> games = <String>[
   'Call Of Duty: Mobile',
   'Free Fire',
   'Blood Strike',
 ];
+
+const List<String> confrontationTypes = <String>['Battle Royal', 'Teams'];
+const List<String> teamSizes = <String>[
+  '2 jugadores',
+  '4 jugadores',
+  '8 jugadores',
+  '10 jugadores',
+];
+
+const List<String> substitutesAmount = <String>[
+  '2 jugadores',
+  '4 jugadores',
+  '8 jugadores',
+  '10 jugadores',
+];
+
+const List<String> regions = <String>['Venezuela', 'Colombia', 'Brasil', 'USA'];
+
+const List<String> pointSystem = <String>[
+  '1:300',
+  '2:200',
+  '3:100',
+  '4:50',
+  '5:25',
+  '6:10',
+  '7:5',
+];
+
 typedef MenuEntry = DropdownMenuEntry<String>;
 
 enum TournamentType { public, private }
@@ -22,13 +50,82 @@ class CreateTournamentScreen extends StatefulWidget {
 class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
   int _index = 0;
 
-  static final List<MenuEntry> menuEntries = UnmodifiableListView<MenuEntry>(
-    list.map<MenuEntry>((String name) => MenuEntry(value: name, label: name)),
+  static final List<MenuEntry> gamesEntries = UnmodifiableListView<MenuEntry>(
+    games.map<MenuEntry>((String name) => MenuEntry(value: name, label: name)),
   );
-  String dropdownValue = list.first;
+  String gamesDropdownvalue = games.first;
+
+  static final List<MenuEntry> confrontationTypeEntries =
+      UnmodifiableListView<MenuEntry>(
+        confrontationTypes.map<MenuEntry>(
+          (String name) => MenuEntry(value: name, label: name),
+        ),
+      );
+  String confrontationTypeDropdownvalue = confrontationTypes.first;
+
+  static final List<MenuEntry> teamSizesEntries =
+      UnmodifiableListView<MenuEntry>(
+        teamSizes.map<MenuEntry>(
+          (String name) => MenuEntry(value: name, label: name),
+        ),
+      );
+  String teamSizeDropdownvalue = confrontationTypes.first;
+
+  static final List<MenuEntry> substitutesAmountEntries =
+      UnmodifiableListView<MenuEntry>(
+        substitutesAmount.map<MenuEntry>(
+          (String name) => MenuEntry(value: name, label: name),
+        ),
+      );
+  String substitutesAmountDropdownvalue = confrontationTypes.first;
+
+  static final List<MenuEntry> regionEntries = UnmodifiableListView<MenuEntry>(
+    confrontationTypes.map<MenuEntry>(
+      (String name) => MenuEntry(value: name, label: name),
+    ),
+  );
+  String regionDropdownvalue = confrontationTypes.first;
+
+  static final List<MenuEntry> pointSystemEntries =
+      UnmodifiableListView<MenuEntry>(
+        pointSystem.map<MenuEntry>(
+          (String name) => MenuEntry(value: name, label: name),
+        ),
+      );
+
+  String pointSystemDropdownValue = pointSystem.first;
 
   TournamentType tournamentTypeView = TournamentType.public;
   CondutionMode condutionModeView = CondutionMode.auto;
+
+  late TextEditingController playersAmountTEC;
+  late TextEditingController tournamentNameTEC;
+  late TextEditingController minPlayersTEC;
+  late TextEditingController maxPlayersTEC;
+  late TextEditingController teamsPerMatchTEC;
+  late TextEditingController pointsPerKillTEC;
+
+  @override
+  void initState() {
+    super.initState();
+    playersAmountTEC = TextEditingController();
+    tournamentNameTEC = TextEditingController();
+    minPlayersTEC = TextEditingController();
+    maxPlayersTEC = TextEditingController();
+    teamsPerMatchTEC = TextEditingController();
+    pointsPerKillTEC = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    playersAmountTEC.dispose();
+    tournamentNameTEC.dispose();
+    minPlayersTEC.dispose();
+    maxPlayersTEC.dispose();
+    teamsPerMatchTEC.dispose();
+    pointsPerKillTEC.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -146,12 +243,11 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                     ),
                     DropdownMenu(
                       width: double.infinity,
-                      dropdownMenuEntries: menuEntries,
-                      initialSelection: list.first,
+                      dropdownMenuEntries: gamesEntries,
+                      initialSelection: games.first,
                       onSelected: (String? value) {
-                        // This is called when the user selects an item.
                         setState(() {
-                          dropdownValue = value!;
+                          gamesDropdownvalue = value!;
                         });
                       },
                     ),
@@ -169,12 +265,12 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                         Text('Tipo de Enfrentamiento'),
                         DropdownMenu(
                           width: double.infinity,
-                          dropdownMenuEntries: menuEntries,
-                          initialSelection: list.first,
+                          dropdownMenuEntries: confrontationTypeEntries,
+                          initialSelection: confrontationTypes.first,
                           onSelected: (String? value) {
                             // This is called when the user selects an item.
                             setState(() {
-                              dropdownValue = value!;
+                              confrontationTypeDropdownvalue = value!;
                             });
                           },
                         ),
@@ -185,17 +281,13 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                       spacing: 6,
                       children: [
                         Text('Cantidad de Jugadores'),
-
-                        DropdownMenu(
-                          width: double.infinity,
-                          dropdownMenuEntries: menuEntries,
-                          initialSelection: list.first,
-                          onSelected: (String? value) {
-                            // This is called when the user selects an item.
-                            setState(() {
-                              dropdownValue = value!;
-                            });
-                          },
+                        TextField(
+                          decoration: InputDecoration(
+                            hintText: '100 jugadores',
+                          ),
+                          controller: playersAmountTEC,
+                          keyboardType: TextInputType.number,
+                          maxLength: 3,
                         ),
                       ],
                     ),
@@ -207,12 +299,12 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                         Text('Tamaño del Equipo'),
                         DropdownMenu(
                           width: double.infinity,
-                          dropdownMenuEntries: menuEntries,
-                          initialSelection: list.first,
+                          dropdownMenuEntries: teamSizesEntries,
+                          initialSelection: teamSizes.first,
                           onSelected: (String? value) {
                             // This is called when the user selects an item.
                             setState(() {
-                              dropdownValue = value!;
+                              teamSizeDropdownvalue = value!;
                             });
                           },
                         ),
@@ -226,12 +318,12 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                         Text('Cantidad de Sustitutos'),
                         DropdownMenu(
                           width: double.infinity,
-                          dropdownMenuEntries: menuEntries,
-                          initialSelection: list.first,
+                          dropdownMenuEntries: substitutesAmountEntries,
+                          initialSelection: substitutesAmount.first,
                           onSelected: (String? value) {
                             // This is called when the user selects an item.
                             setState(() {
-                              dropdownValue = value!;
+                              substitutesAmountDropdownvalue = value!;
                             });
                           },
                         ),
@@ -270,7 +362,7 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                             fontWeight: FontWeight.w800,
                           ),
                         ),
-                        TextField(),
+                        TextField(controller: tournamentNameTEC),
                       ],
                     ),
                     Column(
@@ -300,37 +392,50 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                         ),
                         DropdownMenu(
                           width: double.infinity,
-                          dropdownMenuEntries: menuEntries,
-                          initialSelection: list.first,
+                          dropdownMenuEntries: regionEntries,
+                          initialSelection: regions.first,
                           onSelected: (String? value) {
                             // This is called when the user selects an item.
                             setState(() {
-                              dropdownValue = value!;
+                              regionDropdownvalue = value!;
                             });
                           },
                         ),
                       ],
                     ),
-                    SizedBox(
-                      width: double.infinity,
-                      child: SegmentedButton(
-                        onSelectionChanged: (p0) {
-                          setState(() {
-                            tournamentTypeView = p0.first;
-                          });
-                        },
-                        segments: <ButtonSegment<TournamentType>>[
-                          ButtonSegment(
-                            value: TournamentType.public,
-                            label: Text('Publico'),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: 6,
+                      children: [
+                        Text(
+                          'Modo de admisión',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
                           ),
-                          ButtonSegment(
-                            value: TournamentType.private,
-                            label: Text('Privado'),
+                        ),
+                        SizedBox(
+                          width: double.infinity,
+                          child: SegmentedButton(
+                            onSelectionChanged: (p0) {
+                              setState(() {
+                                tournamentTypeView = p0.first;
+                              });
+                            },
+                            segments: <ButtonSegment<TournamentType>>[
+                              ButtonSegment(
+                                value: TournamentType.public,
+                                label: Text('Publico'),
+                              ),
+                              ButtonSegment(
+                                value: TournamentType.private,
+                                label: Text('Privado'),
+                              ),
+                            ],
+                            selected: <TournamentType>{tournamentTypeView},
                           ),
-                        ],
-                        selected: <TournamentType>{tournamentTypeView},
-                      ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -416,7 +521,15 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                         ),
                       ],
                     ),
+                    Text(
+                      'Cantidad de equipos',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
                     Row(
+                      spacing: 8,
                       children: [
                         Expanded(
                           child: Column(
@@ -424,15 +537,12 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                             spacing: 6,
                             children: [
                               Text('Minimo'),
-                              DropdownMenu(
-                                dropdownMenuEntries: menuEntries,
-                                initialSelection: list.first,
-                                onSelected: (String? value) {
-                                  // This is called when the user selects an item.
-                                  setState(() {
-                                    dropdownValue = value!;
-                                  });
-                                },
+                              TextField(controller: minPlayersTEC, 
+                                keyboardType: TextInputType.number,
+                                maxLength: 2,
+                                decoration: InputDecoration(
+                                  hintText: 'ej. 2-10',
+                                ),
                               ),
                             ],
                           ),
@@ -443,15 +553,12 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                             spacing: 6,
                             children: [
                               Text('Maximo'),
-                              DropdownMenu(
-                                dropdownMenuEntries: menuEntries,
-                                initialSelection: list.first,
-                                onSelected: (String? value) {
-                                  // This is called when the user selects an item.
-                                  setState(() {
-                                    dropdownValue = value!;
-                                  });
-                                },
+                              TextField(controller: maxPlayersTEC,
+                                keyboardType: TextInputType.number,
+                                maxLength: 2,
+                                decoration: InputDecoration(
+                                  hintText: 'ej. 10-20',
+                                ),
                               ),
                             ],
                           ),
@@ -464,16 +571,10 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                       spacing: 6,
                       children: [
                         Text('Equipos por partido'),
-                        DropdownMenu(
-                          width: double.infinity,
-                          dropdownMenuEntries: menuEntries,
-                          initialSelection: list.first,
-                          onSelected: (String? value) {
-                            // This is called when the user selects an item.
-                            setState(() {
-                              dropdownValue = value!;
-                            });
-                          },
+                        TextField(
+                          controller: teamsPerMatchTEC,
+                          keyboardType: TextInputType.number,
+                          maxLength: 2,
                         ),
                       ],
                     ),
@@ -485,57 +586,29 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                         Text('Sistema de puntos'),
                         DropdownMenu(
                           width: double.infinity,
-                          dropdownMenuEntries: menuEntries,
-                          initialSelection: list.first,
+                          dropdownMenuEntries: pointSystemEntries,
+                          initialSelection: pointSystem.first,
                           onSelected: (String? value) {
                             // This is called when the user selects an item.
                             setState(() {
-                              dropdownValue = value!;
+                              pointSystemDropdownValue = value!;
                             });
                           },
                         ),
                       ],
                     ),
-
-                    Row(
+                    Text(
+                      'El sistema de puntos se puede modifiar para adaptarse mejor al formato de su torneo.',
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: 6,
                       children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            spacing: 6,
-                            children: [
-                              Text('Kill'),
-                              DropdownMenu(
-                                dropdownMenuEntries: menuEntries,
-                                initialSelection: list.first,
-                                onSelected: (String? value) {
-                                  // This is called when the user selects an item.
-                                  setState(() {
-                                    dropdownValue = value!;
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            spacing: 6,
-                            children: [
-                              Text('Puntos'),
-                              DropdownMenu(
-                                dropdownMenuEntries: menuEntries,
-                                initialSelection: list.first,
-                                onSelected: (String? value) {
-                                  // This is called when the user selects an item.
-                                  setState(() {
-                                    dropdownValue = value!;
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
+                        Text('Puntos por kill'),
+                        TextField(
+                          controller: pointsPerKillTEC,
+                          keyboardType: TextInputType.number,
+                          maxLength: 2,
                         ),
                       ],
                     ),
