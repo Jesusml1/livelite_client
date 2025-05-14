@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:io';
 import 'package:flutter/material.dart';
 
 const List<String> games = <String>[
@@ -49,6 +50,9 @@ class CreateTournamentScreen extends StatefulWidget {
 
 class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
   int _index = 0;
+
+  DateTime? _dateSelected;
+  TimeOfDay? _timeSelected;
 
   static final List<MenuEntry> gamesEntries = UnmodifiableListView<MenuEntry>(
     games.map<MenuEntry>((String name) => MenuEntry(value: name, label: name)),
@@ -104,6 +108,8 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
   late TextEditingController maxPlayersTEC;
   late TextEditingController teamsPerMatchTEC;
   late TextEditingController pointsPerKillTEC;
+  late TextEditingController dateSelectedTEC;
+  late TextEditingController timeSelectedTEC;
 
   @override
   void initState() {
@@ -114,6 +120,8 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
     maxPlayersTEC = TextEditingController();
     teamsPerMatchTEC = TextEditingController();
     pointsPerKillTEC = TextEditingController();
+    dateSelectedTEC = TextEditingController();
+    timeSelectedTEC = TextEditingController();
   }
 
   @override
@@ -125,6 +133,8 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
     maxPlayersTEC.dispose();
     teamsPerMatchTEC.dispose();
     pointsPerKillTEC.dispose();
+    dateSelectedTEC.dispose();
+    timeSelectedTEC.dispose();
   }
 
   @override
@@ -356,7 +366,7 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                       spacing: 6,
                       children: [
                         Text(
-                          'Nombre del torneo',
+                          'Nombre del torneo*',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w800,
@@ -376,7 +386,53 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                             fontWeight: FontWeight.w800,
                           ),
                         ),
-                        TextField(),
+                        Row(
+                          spacing: 8,
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                controller: dateSelectedTEC,
+                                onTap: () async {
+                                  final dateSelected = await showDatePicker(
+                                    context: context,
+                                    initialDate: DateTime.now(),
+                                    firstDate: DateTime(2020),
+                                    lastDate: DateTime(2030),
+                                  );
+                                  if (dateSelected != null) {
+                                    setState(() {
+                                      _dateSelected = dateSelected;
+                                      dateSelectedTEC.text =
+                                          '${dateSelected.day}/${dateSelected.month}/${dateSelected.year}';
+                                    });
+                                  }
+                                },
+                                decoration: InputDecoration(
+                                  hintText: 'dd/mm/aaaa',
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: TextField(
+                                controller: timeSelectedTEC,
+                                onTap: () async {
+                                  final timeSelected = await showTimePicker(
+                                    context: context,
+                                    initialTime: TimeOfDay.now(),
+                                  );
+                                  if (timeSelected != null) {
+                                    setState(() {
+                                      _timeSelected = timeSelected;
+                                      timeSelectedTEC.text =
+                                          '${timeSelected.hour}:${timeSelected.minute}';
+                                    });
+                                  }
+                                },
+                                decoration: InputDecoration(hintText: 'hh:mm'),
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                     Column(
@@ -537,7 +593,8 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                             spacing: 6,
                             children: [
                               Text('Minimo'),
-                              TextField(controller: minPlayersTEC, 
+                              TextField(
+                                controller: minPlayersTEC,
                                 keyboardType: TextInputType.number,
                                 maxLength: 2,
                                 decoration: InputDecoration(
@@ -553,7 +610,8 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                             spacing: 6,
                             children: [
                               Text('Maximo'),
-                              TextField(controller: maxPlayersTEC,
+                              TextField(
+                                controller: maxPlayersTEC,
                                 keyboardType: TextInputType.number,
                                 maxLength: 2,
                                 decoration: InputDecoration(
