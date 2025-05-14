@@ -1,8 +1,8 @@
 import 'dart:collection';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:livelite_client/modules/models/tournament_create_request.dart';
 
 const List<String> games = <String>[
@@ -1144,7 +1144,9 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
                           autoCancelMatch: _autoCancelMatch,
                           autoCancelFailedMatch: _autoCancelFailedMatch,
                         );
-                        print(requestPayload.toJson());
+                        if (kDebugMode) {
+                          print(requestPayload.toJson());
+                        }
                       },
                       child: Text('Crear torneo'),
                     ),
