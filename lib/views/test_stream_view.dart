@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:livelite_client/modules/streaming/models/comment.dart';
 
 class StreamingPage extends StatefulWidget {
   const StreamingPage({super.key});
@@ -12,6 +15,9 @@ class _StreamingPageState extends State<StreamingPage> {
   final TextEditingController _commentController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   bool _isFullScreen = false;
+  bool _showControls = true;
+  Timer? _controlsTimer;
+
   final List<Comment> _comments = [
     Comment(
       username: "User3",
@@ -28,13 +34,19 @@ class _StreamingPageState extends State<StreamingPage> {
       text: "Great stream!",
       timestamp: DateTime.now(),
     ),
-    // Comments are now in chronological order (oldest first)
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _startHideControlsTimer();
+  }
 
   @override
   void dispose() {
     _commentController.dispose();
     _scrollController.dispose();
+    _controlsTimer?.cancel();
     super.dispose();
   }
 
@@ -47,9 +59,34 @@ class _StreamingPageState extends State<StreamingPage> {
           DeviceOrientation.landscapeRight,
         ]);
         SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+        _showControls = true;
+        _startHideControlsTimer();
       } else {
         SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
         SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+        _controlsTimer?.cancel();
+      }
+    });
+  }
+
+  void _toggleControls() {
+    setState(() {
+      _showControls = !_showControls;
+      if (_showControls) {
+        _startHideControlsTimer();
+      } else {
+        _controlsTimer?.cancel();
+      }
+    });
+  }
+
+  void _startHideControlsTimer() {
+    _controlsTimer?.cancel();
+    _controlsTimer = Timer(const Duration(seconds: 3), () {
+      if (mounted && _isFullScreen) {
+        setState(() {
+          _showControls = false;
+        });
       }
     });
   }
@@ -57,7 +94,6 @@ class _StreamingPageState extends State<StreamingPage> {
   void _addComment() {
     if (_commentController.text.isNotEmpty) {
       setState(() {
-        // Add new comment to the end of the list (newest at bottom)
         _comments.add(
           Comment(
             username: "You",
@@ -68,7 +104,6 @@ class _StreamingPageState extends State<StreamingPage> {
         _commentController.clear();
       });
 
-      // Scroll to the bottom to show the new comment
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent,
@@ -84,9 +119,7 @@ class _StreamingPageState extends State<StreamingPage> {
     if (_isFullScreen) {
       return Scaffold(
         body: GestureDetector(
-          onTap: () {
-            // Show/hide controls on tap in fullscreen mode
-          },
+          onTap: _toggleControls,
           child: Stack(
             children: [
               // Placeholder for video stream (fullscreen)
@@ -99,14 +132,88 @@ class _StreamingPageState extends State<StreamingPage> {
                   ),
                 ),
               ),
-              // Fullscreen exit button
-              Positioned(
-                top: 20,
-                right: 20,
-                child: IconButton(
-                  icon: const Icon(Icons.fullscreen_exit),
-                  onPressed: _toggleFullScreen,
-                  color: Colors.white,
+
+              // Fullscreen controls overlay
+              AnimatedOpacity(
+                opacity: _showControls ? 1.0 : 0.0,
+                duration: const Duration(milliseconds: 300),
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.black.withValues(alpha: 0.7),
+                        Colors.transparent,
+                        Colors.transparent,
+                        Colors.black.withValues(alpha: 0.7),
+                      ],
+                    ),
+                  ),
+                  child: SafeArea(
+                    child: Column(
+                      children: [
+                        // Top controls
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.arrow_back),
+                                onPressed: _toggleFullScreen,
+                                color: Colors.white,
+                              ),
+                              const Text(
+                                "Live Stream",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.fullscreen_exit),
+                                onPressed: _toggleFullScreen,
+                                color: Colors.white,
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        const Spacer(),
+
+                        // Bottom controls
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.play_arrow),
+                                onPressed: () {
+                                  // Play/pause functionality
+                                  _startHideControlsTimer();
+                                },
+                                color: Colors.white,
+                                iconSize: 36,
+                              ),
+                              const SizedBox(width: 24),
+                              IconButton(
+                                icon: const Icon(Icons.volume_up),
+                                onPressed: () {
+                                  // Volume control
+                                  _startHideControlsTimer();
+                                },
+                                color: Colors.white,
+                                iconSize: 36,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -152,7 +259,6 @@ class _StreamingPageState extends State<StreamingPage> {
               child: ListView.builder(
                 controller: _scrollController,
                 itemCount: _comments.length,
-                // No reverse property - we'll show comments in chronological order
                 itemBuilder: (context, index) {
                   final comment = _comments[index];
                   return Padding(
@@ -220,7 +326,10 @@ class _StreamingPageState extends State<StreamingPage> {
                     child: TextField(
                       controller: _commentController,
                       decoration: const InputDecoration(
-                        hintText: "Deja un comentario...",
+                        hintText: "Add a comment...",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(24)),
+                        ),
                         contentPadding: EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 8,
@@ -257,16 +366,4 @@ class _StreamingPageState extends State<StreamingPage> {
       return "${difference.inDays}d ago";
     }
   }
-}
-
-class Comment {
-  final String username;
-  final String text;
-  final DateTime timestamp;
-
-  Comment({
-    required this.username,
-    required this.text,
-    required this.timestamp,
-  });
 }
