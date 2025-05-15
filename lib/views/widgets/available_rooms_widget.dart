@@ -88,7 +88,7 @@ class _AvailableRoomsWidgetState extends State<AvailableRoomsWidget> {
         final room = widget.rooms[index];
         return ListTile(
           title: Text(room.name),
-          trailing: ElevatedButton(
+          trailing: FilledButton(
             onPressed: _busy ? null : () => join(context, room.name),
             child: Text('Join'),
           ),
