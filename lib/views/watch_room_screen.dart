@@ -568,11 +568,6 @@ class _WatchStreamViewState extends State<WatchStreamView> {
                             controller: _commentController,
                             decoration: const InputDecoration(
                               hintText: "Add a comment...",
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(24),
-                                ),
-                              ),
                               contentPadding: EdgeInsets.symmetric(
                                 horizontal: 16,
                                 vertical: 8,
