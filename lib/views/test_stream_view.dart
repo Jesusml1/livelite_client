@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:livelite_client/modules/streaming/models/comment.dart';
+import 'package:livelite_client/views/widgets/comment_input_section.dart';
 
 class StreamingPage extends StatefulWidget {
   const StreamingPage({super.key});
@@ -114,6 +115,21 @@ class _StreamingPageState extends State<StreamingPage> {
     }
   }
 
+  void _handleNewComment(String text) {
+    setState(() {
+      _comments.add(
+        Comment(username: "You", text: text, timestamp: DateTime.now()),
+      );
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    });
+  }
   @override
   Widget build(BuildContext context) {
     if (_isFullScreen) {
@@ -307,43 +323,8 @@ class _StreamingPageState extends State<StreamingPage> {
           ),
 
           // Comment input section
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: Theme.of(context).cardColor,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  blurRadius: 4,
-                  offset: const Offset(0, -1),
-                ),
-              ],
-            ),
-            child: SafeArea(
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _commentController,
-                      decoration: const InputDecoration(
-                        hintText: "Add a comment...",
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  IconButton(
-                    icon: const Icon(Icons.send),
-                    onPressed: _addComment,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                ],
-              ),
-            ),
-          ),
+          CommentInputSection(onCommentSubmitted: _handleNewComment),
+         
         ],
       ),
     );

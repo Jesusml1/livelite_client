@@ -20,6 +20,8 @@ abstract final class AppTheme {
   static ThemeData light = FlexThemeData.light(
     // Using FlexColorScheme built-in FlexScheme enum based colors
     scheme: FlexScheme.cyanM3,
+    // Convenience direct styling properties.
+    tabBarStyle: FlexTabBarStyle.forBackground,
     // Component theme configurations for light mode.
     subThemesData: const FlexSubThemesData(
       interactionEffects: true,
@@ -36,6 +38,7 @@ abstract final class AppTheme {
       inputDecoratorBorderType: FlexInputBorderType.outline,
       inputDecoratorRadius: 6.0,
       alignedDropdown: true,
+      tabBarDividerColor: Color(0x00000000),
       searchBarRadius: 8.0,
       searchViewRadius: 8.0,
       navigationRailUseIndicator: true,
@@ -49,6 +52,8 @@ abstract final class AppTheme {
   static ThemeData dark = FlexThemeData.dark(
     // Using FlexColorScheme built-in FlexScheme enum based colors.
     scheme: FlexScheme.cyanM3,
+    // Convenience direct styling properties.
+    tabBarStyle: FlexTabBarStyle.forBackground,
     // Component theme configurations for dark mode.
     subThemesData: const FlexSubThemesData(
       interactionEffects: true,
@@ -67,6 +72,7 @@ abstract final class AppTheme {
       inputDecoratorBorderType: FlexInputBorderType.outline,
       inputDecoratorRadius: 6.0,
       alignedDropdown: true,
+      tabBarDividerColor: Color(0x00000000),
       searchBarRadius: 8.0,
       searchViewRadius: 8.0,
       navigationRailUseIndicator: true,

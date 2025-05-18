@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:livekit_client/livekit_client.dart';
 import 'package:livelite_client/modules/streaming/models/comment.dart';
+import 'package:livelite_client/views/widgets/comment_input_section.dart';
 import 'package:livelite_client/views/widgets/participant.dart';
 import 'package:livelite_client/views/widgets/participant_info.dart';
 // import 'package:livelite_client/views/widgets/viewer_count_widget.dart';
@@ -324,27 +325,43 @@ class _WatchStreamViewState extends State<WatchStreamView> {
     });
   }
 
-  void _addComment() {
-    if (_commentController.text.isNotEmpty) {
-      setState(() {
-        _comments.add(
-          Comment(
-            username: "You",
-            text: _commentController.text,
-            timestamp: DateTime.now(),
-          ),
-        );
-        _commentController.clear();
-      });
+  // void _addComment() {
+  //   if (_commentController.text.isNotEmpty) {
+  //     setState(() {
+  //       _comments.add(
+  //         Comment(
+  //           username: "You",
+  //           text: _commentController.text,
+  //           timestamp: DateTime.now(),
+  //         ),
+  //       );
+  //       _commentController.clear();
+  //     });
 
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
-      });
-    }
+  //     WidgetsBinding.instance.addPostFrameCallback((_) {
+  //       _scrollController.animateTo(
+  //         _scrollController.position.maxScrollExtent,
+  //         duration: const Duration(milliseconds: 300),
+  //         curve: Curves.easeOut,
+  //       );
+  //     });
+  //   }
+  // }
+
+  void _handleNewComment(String text) {
+    setState(() {
+      _comments.add(
+        Comment(username: "You", text: text, timestamp: DateTime.now()),
+      );
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    });
   }
 
   @override
@@ -548,43 +565,7 @@ class _WatchStreamViewState extends State<WatchStreamView> {
                 ),
 
                 // Comment input section
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).cardColor,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        blurRadius: 4,
-                        offset: const Offset(0, -1),
-                      ),
-                    ],
-                  ),
-                  child: SafeArea(
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: _commentController,
-                            decoration: const InputDecoration(
-                              hintText: "Add a comment...",
-                              contentPadding: EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 8,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        IconButton(
-                          icon: const Icon(Icons.send),
-                          onPressed: _addComment,
-                          color: Theme.of(context).primaryColor,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                CommentInputSection(onCommentSubmitted: _handleNewComment),
               ],
             ),
           );
