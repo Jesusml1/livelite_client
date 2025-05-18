@@ -1,9 +1,7 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:livelite_client/modules/streaming/models/comment.dart';
-import 'package:livelite_client/views/widgets/comment_input_section.dart';
+import 'package:livelite_client/views/widgets/stream_chat_section.dart';
 
 class StreamingPage extends StatefulWidget {
   const StreamingPage({super.key});
@@ -13,29 +11,10 @@ class StreamingPage extends StatefulWidget {
 }
 
 class _StreamingPageState extends State<StreamingPage> {
-  final TextEditingController _commentController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   bool _isFullScreen = false;
   bool _showControls = true;
   Timer? _controlsTimer;
-
-  final List<Comment> _comments = [
-    Comment(
-      username: "User3",
-      text: "I'm learning so much!",
-      timestamp: DateTime.now().subtract(const Duration(minutes: 5)),
-    ),
-    Comment(
-      username: "User2",
-      text: "How did you do that?",
-      timestamp: DateTime.now().subtract(const Duration(minutes: 2)),
-    ),
-    Comment(
-      username: "User1",
-      text: "Great stream!",
-      timestamp: DateTime.now(),
-    ),
-  ];
 
   @override
   void initState() {
@@ -45,7 +24,6 @@ class _StreamingPageState extends State<StreamingPage> {
 
   @override
   void dispose() {
-    _commentController.dispose();
     _scrollController.dispose();
     _controlsTimer?.cancel();
     super.dispose();
@@ -92,44 +70,6 @@ class _StreamingPageState extends State<StreamingPage> {
     });
   }
 
-  void _addComment() {
-    if (_commentController.text.isNotEmpty) {
-      setState(() {
-        _comments.add(
-          Comment(
-            username: "You",
-            text: _commentController.text,
-            timestamp: DateTime.now(),
-          ),
-        );
-        _commentController.clear();
-      });
-
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
-      });
-    }
-  }
-
-  void _handleNewComment(String text) {
-    setState(() {
-      _comments.add(
-        Comment(username: "You", text: text, timestamp: DateTime.now()),
-      );
-    });
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
-    });
-  }
   @override
   Widget build(BuildContext context) {
     if (_isFullScreen) {
@@ -267,81 +207,9 @@ class _StreamingPageState extends State<StreamingPage> {
               ),
             ],
           ),
-
-          // Comments section
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: ListView.builder(
-                controller: _scrollController,
-                itemCount: _comments.length,
-                itemBuilder: (context, index) {
-                  final comment = _comments[index];
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        CircleAvatar(
-                          radius: 16,
-                          child: Text(comment.username[0]),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    comment.username,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    _formatTimestamp(comment.timestamp),
-                                    style: TextStyle(
-                                      color: Colors.grey[400],
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              Text(comment.text),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-
-          // Comment input section
-          CommentInputSection(onCommentSubmitted: _handleNewComment),
-         
+          StreamChatSection(),
         ],
       ),
     );
-  }
-
-  String _formatTimestamp(DateTime timestamp) {
-    final now = DateTime.now();
-    final difference = now.difference(timestamp);
-
-    if (difference.inSeconds < 60) {
-      return "just now";
-    } else if (difference.inMinutes < 60) {
-      return "${difference.inMinutes}m ago";
-    } else if (difference.inHours < 24) {
-      return "${difference.inHours}h ago";
-    } else {
-      return "${difference.inDays}d ago";
-    }
   }
 }
