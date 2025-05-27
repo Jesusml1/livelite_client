@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:livelite_client/views/pre_join_screen_capture.dart';
 import 'package:livelite_client/views/rtmp_screen.dart';
 
 class UploadBottomSheet extends StatelessWidget {
@@ -55,6 +56,24 @@ class UploadBottomSheet extends StatelessWidget {
                             return PopScope(
                               onPopInvokedWithResult: (didPop, _) {},
                               child: const Placeholder(),
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.screenshot_rounded, color: Colors.green.shade500),
+                    title: const Text('Screen Capture'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return PopScope(
+                              onPopInvokedWithResult: (didPop, _) {},
+                              child: PreJoinScreenCapture(),
                             );
                           },
                         ),
