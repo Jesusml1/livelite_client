@@ -7,6 +7,7 @@ import 'package:livekit_client/livekit_client.dart';
 import 'package:livelite_client/config/config.dart';
 // import 'package:livelite_client/modules/models/video_devices_id.dart';
 import 'package:livelite_client/modules/streaming/backend/streaming.dart';
+import 'package:livelite_client/views/screen_capture_room.dart';
 import 'package:livelite_client/views/widgets/loading_indicator.dart';
 import 'package:nanoid/nanoid.dart';
 import 'package:webrtc_interface/webrtc_interface.dart' as webrtc;
@@ -147,7 +148,8 @@ class _PreJoinScreenCaptureState extends State<PreJoinScreenCapture> {
             _screenTrack = await LocalVideoTrack.createScreenShareTrack(
               ScreenShareCaptureOptions(
                 captureScreenAudio: true,
-                maxFrameRate: 30,
+                maxFrameRate: 60,
+                params: VideoParametersPresets.screenShareH1080FPS30
               ),
             );
             print('starting screen sharing...');
@@ -169,7 +171,7 @@ class _PreJoinScreenCaptureState extends State<PreJoinScreenCapture> {
       _screenTrack = await LocalVideoTrack.createScreenShareTrack(
         ScreenShareCaptureOptions(
           captureScreenAudio: true,
-          maxFrameRate: 30,
+          maxFrameRate: 60,
           useiOSBroadcastExtension: true,
         ),
       );
@@ -290,10 +292,10 @@ class _PreJoinScreenCaptureState extends State<PreJoinScreenCapture> {
                 enabled: enableBackupVideoCodec,
               ),
             ),
-            defaultCameraCaptureOptions: CameraCaptureOptions(
-              maxFrameRate: 30,
-              params: _selectedVideoParameters,
-            ),
+            // defaultCameraCaptureOptions: CameraCaptureOptions(
+            //   maxFrameRate: 30,
+            //   params: _selectedVideoParameters,
+            // ),
           ),
         );
 
@@ -311,18 +313,18 @@ class _PreJoinScreenCaptureState extends State<PreJoinScreenCapture> {
         );
 
         if (context.mounted) {
-          // await Navigator.push<void>(
-          //   context,
-          //   MaterialPageRoute(
-          //     builder:
-          //         (_) => RoomView(
-          //           room,
-          //           subsOnlyStream,
-          //           videoViewMirrorMode,
-          //           listener,
-          //         ),
-          //   ),
-          // );
+          await Navigator.push<void>(
+            context,
+            MaterialPageRoute(
+              builder:
+                  (_) => ScreenCaptureRoom(
+                    room,
+                    subsOnlyStream,
+                    videoViewMirrorMode,
+                    listener,
+                  ),
+            ),
+          );
         }
       } catch (e) {
         if (kDebugMode) {

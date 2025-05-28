@@ -200,6 +200,7 @@ class _WatchStreamViewState extends State<WatchStreamView> {
     for (var participant in widget.room.remoteParticipants.values) {
       for (var t in participant.videoTrackPublications) {
         if (t.isScreenShare) {
+          print('room is screen sharing...');
           screenTracks.add(
             ParticipantTrack(
               participant: participant,
@@ -219,18 +220,18 @@ class _WatchStreamViewState extends State<WatchStreamView> {
       }
     }
 
-    if (!busy && userMediaTracks.isEmpty) {
-      setState(() {
-        busy = true;
-      });
-      widget.room.disconnect().then((value) {
-        if (mounted) {
-          Fluttertoast.showToast(msg: 'Stream ended');
-          widget.refreshStreamsList();
-          // Navigator.of(context).pop();
-        }
-      });
-    }
+    // if (!busy && userMediaTracks.isEmpty) {
+    //   setState(() {
+    //     busy = true;
+    //   });
+    //   widget.room.disconnect().then((value) {
+    //     if (mounted) {
+    //       Fluttertoast.showToast(msg: 'Stream ended');
+    //       widget.refreshStreamsList();
+    //       // Navigator.of(context).pop();
+    //     }
+    //   });
+    // }
 
     userMediaTracks.sort((a, b) {
       // loudest speaker first
