@@ -44,8 +44,8 @@ class _PreJoinScreenCaptureState extends State<PreJoinScreenCapture> {
 
   // MediaDevice? _selectedVideoDevice;
   // MediaDevice? _selectedAudioDevice;
-  final VideoParameters _selectedVideoParameters =
-      VideoParametersPresets.h720_169;
+  // final VideoParameters _selectedVideoParameters =
+  //     VideoParametersPresets.h720_169;
   VideoViewMirrorMode videoViewMirrorMode = VideoViewMirrorMode.off;
 
   bool subsOnlyStream = false;
@@ -265,8 +265,8 @@ class _PreJoinScreenCaptureState extends State<PreJoinScreenCapture> {
   Widget build(BuildContext context) {
     Future<String?> getToken() async {
       final token = await generateTokenToJoin(
-        nickname: "test",
-        roomName: "screen capture test",
+        nickname: nanoid(10),
+        roomName: "screen-capture-test",
       );
       if (token != null) {
         return token;
