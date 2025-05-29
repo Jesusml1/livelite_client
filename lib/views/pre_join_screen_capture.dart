@@ -7,6 +7,7 @@ import 'package:livekit_client/livekit_client.dart';
 import 'package:livelite_client/config/config.dart';
 // import 'package:livelite_client/modules/models/video_devices_id.dart';
 import 'package:livelite_client/modules/streaming/backend/streaming.dart';
+import 'package:livelite_client/modules/streaming/game_stream_config.dart';
 import 'package:livelite_client/views/screen_capture_room.dart';
 import 'package:livelite_client/views/widgets/loading_indicator.dart';
 import 'package:nanoid/nanoid.dart';
@@ -147,9 +148,17 @@ class _PreJoinScreenCaptureState extends State<PreJoinScreenCapture> {
             await FlutterBackground.enableBackgroundExecution();
             _screenTrack = await LocalVideoTrack.createScreenShareTrack(
               ScreenShareCaptureOptions(
-                captureScreenAudio: true,
-                maxFrameRate: 60,
-                params: VideoParametersPresets.screenShareH1080FPS30
+                // captureScreenAudio: true,
+                maxFrameRate: 25,
+                params: GameStreamConfig.gamingMobile,
+                // params: VideoParametersPresets.screenShareH1080FPS30
+                // params: VideoParameters(
+                //   dimensions: VideoDimensionsPresets.h1080_169,
+                //   encoding: VideoEncoding(
+                //     maxFramerate: 30,
+                //     maxBitrate: 8000000,
+                //   ),
+                // ),
               ),
             );
             print('starting screen sharing...');
@@ -288,14 +297,16 @@ class _PreJoinScreenCaptureState extends State<PreJoinScreenCapture> {
               stream: nanoid(),
               simulcast: simulcast,
               videoCodec: preferredCodec,
-              backupVideoCodec: BackupVideoCodec(
-                enabled: enableBackupVideoCodec,
-              ),
+              videoEncoding: GameStreamConfig.gamingMobile.encoding,
+              backupVideoCodec: BackupVideoCodec(enabled: false),
+              degradationPreference: DegradationPreference.maintainFramerate,
             ),
-            // defaultCameraCaptureOptions: CameraCaptureOptions(
-            //   maxFrameRate: 30,
-            //   params: _selectedVideoParameters,
-            // ),
+            defaultScreenShareCaptureOptions: ScreenShareCaptureOptions(
+              useiOSBroadcastExtension: true,
+              params: GameStreamConfig.gamingMobile,
+              captureScreenAudio: true,
+            ),
+            e2eeOptions: null,
           ),
         );
 

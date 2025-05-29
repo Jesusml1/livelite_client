@@ -486,87 +486,121 @@ class _WatchStreamViewState extends State<WatchStreamView> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 // Video stream container (portrait mode)
-                AspectRatio(
-                  aspectRatio: 16 / 9,
-                  child: Stack(
-                    alignment: Alignment.topCenter,
-                    children: [
-                      participantTracks.isNotEmpty
-                          ? ParticipantWidget.widgetFor(
-                            participantTracks.first,
-                            showStatsLayer: true,
-                            videoViewMirrorMode: VideoViewMirrorMode.auto,
-                          )
-                          : Container(),
-                      Positioned(
-                        bottom: 10,
-                        right: 10,
-                        child: IconButton(
-                          icon: const Icon(Icons.fullscreen),
-                          onPressed: _toggleFullScreen,
-                          color: Colors.white,
+                SizedBox(
+                  height: 600,
+                  child: ListView.builder(
+                    itemCount: participantTracks.length,
+                    itemBuilder: (context, index) {
+                      final participantTrack = participantTracks[index];
+                      return AspectRatio(
+                        aspectRatio: 16 / 10,
+                        child: Stack(
+                          alignment: Alignment.topCenter,
+                          children: [
+                            participantTracks.isNotEmpty
+                                ? ParticipantWidget.widgetFor(
+                                  participantTrack,
+                                  showStatsLayer: true,
+                                  videoViewMirrorMode: VideoViewMirrorMode.auto,
+                                )
+                                : Container(),
+                            Positioned(
+                              bottom: 10,
+                              right: 10,
+                              child: IconButton(
+                                icon: const Icon(Icons.fullscreen),
+                                onPressed: _toggleFullScreen,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
+                      );
+                    },
                   ),
                 ),
+
+                // AspectRatio(
+                //   aspectRatio: 16 / 9,
+                //   child: Stack(
+                //     alignment: Alignment.topCenter,
+                //     children: [
+                //       participantTracks.isNotEmpty
+                //           ? ParticipantWidget.widgetFor(
+                //             participantTracks.first,
+                //             showStatsLayer: true,
+                //             videoViewMirrorMode: VideoViewMirrorMode.auto,
+                //           )
+                //           : Container(),
+                //       Positioned(
+                //         bottom: 10,
+                //         right: 10,
+                //         child: IconButton(
+                //           icon: const Icon(Icons.fullscreen),
+                //           onPressed: _toggleFullScreen,
+                //           color: Colors.white,
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                // ),
 
                 // Comments section
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: ListView.builder(
-                      controller: _scrollController,
-                      itemCount: _comments.length,
-                      itemBuilder: (context, index) {
-                        final comment = _comments[index];
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              CircleAvatar(
-                                radius: 16,
-                                child: Text(comment.username[0]),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Text(
-                                          comment.username,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Text(
-                                          _formatTimestamp(comment.timestamp),
-                                          style: TextStyle(
-                                            color: Colors.grey[400],
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(comment.text),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
+                // Expanded(
+                //   child: Container(
+                //     padding: const EdgeInsets.symmetric(horizontal: 10),
+                //     child: ListView.builder(
+                //       controller: _scrollController,
+                //       itemCount: _comments.length,
+                //       itemBuilder: (context, index) {
+                //         final comment = _comments[index];
+                //         return Padding(
+                //           padding: const EdgeInsets.symmetric(vertical: 8.0),
+                //           child: Row(
+                //             crossAxisAlignment: CrossAxisAlignment.start,
+                //             children: [
+                //               CircleAvatar(
+                //                 radius: 16,
+                //                 child: Text(comment.username[0]),
+                //               ),
+                //               const SizedBox(width: 8),
+                //               Expanded(
+                //                 child: Column(
+                //                   crossAxisAlignment: CrossAxisAlignment.start,
+                //                   children: [
+                //                     Row(
+                //                       children: [
+                //                         Text(
+                //                           comment.username,
+                //                           style: const TextStyle(
+                //                             fontWeight: FontWeight.bold,
+                //                           ),
+                //                         ),
+                //                         const SizedBox(width: 8),
+                //                         Text(
+                //                           _formatTimestamp(comment.timestamp),
+                //                           style: TextStyle(
+                //                             color: Colors.grey[400],
+                //                             fontSize: 12,
+                //                           ),
+                //                         ),
+                //                       ],
+                //                     ),
+                //                     const SizedBox(height: 4),
+                //                     Text(comment.text),
+                //                   ],
+                //                 ),
+                //               ),
+                //             ],
+                //           ),
+                //         );
+                //       },
+                //     ),
+                //   ),
+                // ),
 
                 // Comment input section
-                CommentInputSection(onCommentSubmitted: _handleNewComment),
+                // CommentInputSection(onCommentSubmitted: _handleNewComment),
               ],
             ),
           );
